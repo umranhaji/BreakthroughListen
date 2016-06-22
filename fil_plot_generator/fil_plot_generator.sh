@@ -11,10 +11,9 @@ echo "This script will search for filterbank files of the format
 also process files from all dates instead of providing a custom date range. 
 
 Currently there are a total of $difference filterbank files whose
-plots have not yet been produced.
+plots have not yet been produced."
 
-Would you like to provide a date range? (y/n):"
-read choice
+read -p "Would you like to provide a date range? (y/n): " choice
 
 if [ "$choice" = "n" ]; then
     
@@ -39,11 +38,12 @@ if [ "$choice" = "n" ]; then
 	if test -e "$plotpath"; #Checks if the .png plot corresponding to the .fil file already exists in directory.
 	     then echo "PNG plot for ${filename} already exists in filterbank_plots. Skipping..."
 	     else 
+
 	          echo "Commencing plot generation for ${filename}..."
 		  cp $file /datax2/filterbank_plots
 		  python /datax2/filterbank_plots/filterbank_noshowplot.py -s "${NOFIL}.png" $file
 		  rm /datax2/filterbank_plots/"${filename}"
-		  echo "Plot complete!"
+
 	fi
    done
 
@@ -53,10 +53,8 @@ fi
 
 if [ "$choice" = "y" ]; then
 
-   echo "Please enter the Modified Julian Date (MJD) that you would like to start at:"
-   read MJDstart
-   echo "Now enter the MJD the you would like to stop at:" 
-   read MJDstop
+   read -p "Please enter the Modified Julian Date (MJD) that you would like to start at: " MJDstart
+   read -p "Now enter the MJD the you would like to stop at: " MJDstop
    echo "Finding .fil files for observations in given date range..."
 
    sleep 3s
@@ -101,11 +99,12 @@ date range whose plots have not been produced."
 	 if test -e "$plotpath"; #Checks if the .png plot corresponding to the .fil file already exists in directory.
 	     then echo "PNG plot for ${filename} already exists in filterbank_plots. Skipping..."
 	     else 
+
 	          echo "Commencing plot generation for ${filename}..."
 		  cp $file /datax2/filterbank_plots
 		  python /datax2/filterbank_plots/filterbank_noshowplot.py -s "${NOFIL}.png" $file
 		  rm /datax2/filterbank_plots/"${filename}"
-		  echo "Plot complete!"
+
 	 fi
       done
       
