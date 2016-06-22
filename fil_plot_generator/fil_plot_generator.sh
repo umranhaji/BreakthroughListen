@@ -27,7 +27,7 @@ if [ "$choice" = "n" ]; then
    do
 
         status=$(cat /home/obs/triggers/observation_status)
-	if [ "$status" = "on" ]; then
+	if [ "$status" != "off" ]; then
 	    echo "Observations in progress. Terminating plot generation."
 	    exit
 	fi
@@ -88,7 +88,7 @@ date range whose plots have not been produced."
       do
 
 	status=$(cat /home/obs/triggers/observation_status)
-	if [ "$status" = "on" ]; then
+	if [ "$status" != "off" ]; then
 	    echo "Observations in progress. Terminating plot generation."
 	    exit
 	fi
