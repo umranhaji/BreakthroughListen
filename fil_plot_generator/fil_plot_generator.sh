@@ -11,8 +11,8 @@ echo "This script will search for filterbank files of the format
 also process files from all dates instead of providing a custom date range. 
 
 Currently there are a total of $difference filterbank files whose
-plots have not yet been produced."
-
+plots have not yet been produced.
+"
 read -p "Would you like to provide a date range? (y/n): " choice
 
 if [ "$choice" = "n" ]; then
