@@ -112,7 +112,7 @@ date range whose plots have not been produced."
 
 	 fi
       done
-      
+
       echo ""
       echo "Plots complete for MJD range ${MJDstart} to ${MJDstop}."
 
