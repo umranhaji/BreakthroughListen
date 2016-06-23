@@ -40,7 +40,6 @@ if [ "$choice" = "n" ]; then
 	if test -e "$plotpath"; #Checks if the .png plot corresponding to the .fil file already exists in directory.
 	     then echo "PNG plot for ${filename} already exists in filterbank_plots. Skipping..."
 	     else 
-
 	          echo "Commencing plot generation for ${filename}..."
 		  cp $file /datax2/filterbank_plots
 		  python /datax2/filterbank_plots/filterbank_noshowplot.py -s "${NOFIL}.png" $file
@@ -104,12 +103,10 @@ date range whose plots have not been produced."
 	 if test -e "$plotpath"; #Checks if the .png plot corresponding to the .fil file already exists in directory.
 	     then echo "PNG plot for ${filename} already exists in filterbank_plots. Skipping..."
 	     else 
-
 	          echo "Commencing plot generation for ${filename}..."
 		  cp $file /datax2/filterbank_plots
 		  python /datax2/filterbank_plots/filterbank_noshowplot.py -s "${NOFIL}.png" $file
 		  rm /datax2/filterbank_plots/"${filename}"
-
 	 fi
       done
 
