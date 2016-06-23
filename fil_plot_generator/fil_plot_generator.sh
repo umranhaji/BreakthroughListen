@@ -43,11 +43,10 @@ if [ "$choice" = "n" ]; then
 	          echo "Commencing plot generation for ${filename}..."
 		  cp $file /datax2/filterbank_plots
 		  python /datax2/filterbank_plots/filterbank_noshowplot.py -s "${NOFIL}.png" $file
-		     if [ $? -ne 0 ]; then 
-			 echo $file >> /datax2/filterbank_plots/badfils.txt
-		     fi
+		  if [ $? -ne 0 ]; then
+		      echo $file >> /datax2/filterbank_plots/badfils.txt
+		  fi
 		  rm /datax2/filterbank_plots/"${filename}"
-
 	fi
    done
 
