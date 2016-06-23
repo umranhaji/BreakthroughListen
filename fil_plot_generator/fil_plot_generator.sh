@@ -22,6 +22,8 @@ if [ "$choice" = "n" ]; then
     
    sleep 3s
 
+   echo "The following files caused errors in filterbank.py:" > /datax2/filterbank_plots/badfils.txt
+
    for file in $(find /mnt_blc??/datax*/ -name "*_guppi_*gpuspec.000?.fil"); 
    do
 
@@ -42,6 +44,9 @@ if [ "$choice" = "n" ]; then
 	          echo "Commencing plot generation for ${filename}..."
 		  cp $file /datax2/filterbank_plots
 		  python /datax2/filterbank_plots/filterbank_noshowplot.py -s "${NOFIL}.png" $file
+		     if [ $? -ne 0 ]; then 
+			 echo $file >> /datax2/filterbank_plots/badfils.txt
+		     fi
 		  rm /datax2/filterbank_plots/"${filename}"
 
 	fi
