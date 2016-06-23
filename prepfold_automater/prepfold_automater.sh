@@ -1,16 +1,14 @@
 #!/bin/bash
 
-#source /usr/local/pulsar64/pulsar.csh >& /dev/null
-
-totalPSRfils=$(find /mnt_blc??/datax*/ -name "*guppi*gpuspec.8.0001.fil" | wc -w)
-totalpfd=$(find /datax2/prepfold_outputs/ -name "*.pfd" | wc -w)
+totalPSRfils=$(find /mnt_blc??/datax*/ -name "*guppi*PSR*gpuspec.8.0001.fil" | wc -w)
+totalpfd=$(find /datax2/prepfold_output/ -name "*.pfd" | wc -w)
 totaldifference=$(($totalPSRfils - $totalpfd))
 
 echo ""
 echo "This script will search for pulsar filterbank files of the format
 *guppi*gpuspec.8.0001.fil for a given date range and run prepfold on them,
 outputting the products in /datax2/prepfold-output/. You can also process
-files from al ldates instead of providing a custom data range.
+files from all dates instead of providing a custom date range.
 
 Currently there are a total of $totaldifference pulsar filterbank files
 which have not been run through prepfold.
@@ -24,7 +22,7 @@ if [ "$choice" = "n" ]; then
 
     sleep 3s
 
-    for file in $(find /mnt_blc??/datax*/ -name "*guppi*gpuspec.8.0001.fil"); do 
+    for file in $(find /mnt_blc??/datax*/ -name "*guppi*PSR*gpuspec.8.0001.fil"); do 
 
 	status=$(cat /home/obs/triggers/observation_status)
 	if [ "$status" != "off" ]; then
@@ -39,7 +37,7 @@ if [ "$choice" = "n" ]; then
 	pfd="/datax2/prepfold_output/${NOFIL}_PSR_${PULSAR}.pfd"
 
 	if test -e $pfd; #Checks if one of the outputs of prepfold corresponding to the .fil file already exists in directory.
-	    then echo "Prepfold products for $filename already exists in /datax2/prepfold_output/. Skipping..."
+	    then echo "Prepfold products for $filename already exist in /datax2/prepfold_output/. Skipping..."
 	    else
 	         echo "Running prepfold on $filename..."
 		 cp $file /datax2/prepfold_output
@@ -61,7 +59,7 @@ if [ "$choice" = "y" ]; then
     sleep 3s
 
     for i in $(seq $MJDstart $MJDstop); do
-	numberfils=$(find /mnt_blc??/datax*/ -name "*guppi_${i}_*gpuspec.8.0001.fil" | wc -w)
+	numberfils=$(find /mnt_blc??/datax*/ -name "*guppi_${i}_*PSR*gpuspec.8.0001.fil" | wc -w)
 	numberPFD=$(find /datax2/prepfold_output/ -name "*guppi_${i}_*.pfd" | wc -w)
 	difference=$(($numberfils - $numberPFD))
 	arraydifferences+=($difference)
@@ -79,8 +77,8 @@ range whose prepfold products have not been produced."
     echo "Running prepfold on pulsar .fil files in this date range..."
     sleep 2s
 
-    for i in $(seq $MJdstart $MJDstop); do
-	for file in $(find /mnt_blc??/datax*/ -name "*guppi_${i}_*gpuspec.8.0001.fil"); do
+    for i in $(seq $MJDstart $MJDstop); do
+	for file in $(find /mnt_blc??/datax*/ -name "*guppi_${i}_*PSR*gpuspec.8.0001.fil"); do
 
 	    status=$(cat /home/obs/triggers/observation_status)
             if [ "$status" != "off" ]; then
@@ -95,7 +93,7 @@ range whose prepfold products have not been produced."
 	    pfd="/datax2/prepfold_output/${NOFIL}_PSR_${PULSAR}.pfd"
 
 	    if test -e $pfd; #Checks if one of the outputs of prepfold corresponding to the .fil file already exists in directory.
-            then echo "Prepfold products for $filename already exists in /datax2/prepfold_output/. Skipping..."
+            then echo "Prepfold products for $filename already exist in /datax2/prepfold_output/. Skipping..."
             else
                  echo "Running prepfold on $filename..."
                  cp $file /datax2/prepfold_output
@@ -104,10 +102,8 @@ range whose prepfold products have not been produced."
             fi
 	done
     done
-
     echo ""
-    echo "Prepfold complete for MJD range ${MJDstart} to ${MJDstop}."
-    
+    echo "Prepfold complete for MJD range ${MJDstart} to ${MJDstop}."    
 fi
 
 
