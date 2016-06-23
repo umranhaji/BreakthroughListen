@@ -24,7 +24,7 @@ if [ "$choice" = "n" ]; then
 
     sleep 3s
 
-    for file in $(find /mnt_blc??/datax*2/ -name "*guppi*gpuspec.8.0001.fil"); do 
+    for file in $(find /mnt_blc??/datax*/ -name "*guppi*gpuspec.8.0001.fil"); do 
 
 	status=$(cat /home/obs/triggers/observation_status)
 	if [ "$status" != "off" ]; then
@@ -38,7 +38,7 @@ if [ "$choice" = "n" ]; then
 	PULSAR=$(echo $filename | awk -F_PSR_ '{print $2}' | awk -F_ '{print $1}')
 	pfd="/datax2/prepfold_output/${NOFIL}_PSR_${PULSAR}.pfd"
 
-	if test -e $pfd; Checks if one of the outputs of prepfold corresponding to the .fil file already exists in directory.
+	if test -e $pfd; #Checks if one of the outputs of prepfold corresponding to the .fil file already exists in directory.
 	    then echo "Prepfold products for $filename already exists in /datax2/prepfold_output/. Skipping..."
 	    else
 	         echo "Running prepfold on $filename..."
@@ -94,7 +94,7 @@ range whose prepfold products have not been produced."
 	    PULSAR=$(echo $filename | awk -F_PSR_ '{print $2}' | awk -F_ '{print $1}')
 	    pfd="/datax2/prepfold_output/${NOFIL}_PSR_${PULSAR}.pfd"
 
-	    if test -e $pfd; Checks if one of the outputs of prepfold corresponding to the .fil file already exists in directory.
+	    if test -e $pfd; #Checks if one of the outputs of prepfold corresponding to the .fil file already exists in directory.
             then echo "Prepfold products for $filename already exists in /datax2/prepfold_output/. Skipping..."
             else
                  echo "Running prepfold on $filename..."
