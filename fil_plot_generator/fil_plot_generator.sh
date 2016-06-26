@@ -42,8 +42,8 @@ if [ "$choice" = "n" ]; then
 	     else 
 	          echo "Commencing plot generation for ${filename}..."
 		  cp $file /datax2/filterbank_plots
-		  python /datax2/filterbank_plots/filterbank_noshowplot.py -s "${NOFIL}.png" $file
-		  if [ $? -ne 0 ]; then
+		  python /datax2/filterbank_plots/filterbank_modified.py -i -s "${NOFIL}.png" $file
+		  if [ $? -ne 0 ]; then #if plot generation fails due to error with filterbank.py, record name of .fil file
 		      echo $file >> /datax2/filterbank_plots/badfils.txt
 		  fi
 		  rm /datax2/filterbank_plots/"${filename}"
@@ -104,7 +104,7 @@ date range whose plots have not been produced."
 	     else 
 	          echo "Commencing plot generation for ${filename}..."
 		  cp $file /datax2/filterbank_plots
-		  python /datax2/filterbank_plots/filterbank_noshowplot.py -s "${NOFIL}.png" $file
+		  python /datax2/filterbank_plots/filterbank_modified.py -i -s "${NOFIL}.png" $file
 		  rm /datax2/filterbank_plots/"${filename}"
 	 fi
       done
