@@ -5,8 +5,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Extract parameters from .fil files')
 parser.add_argument('filename', type=str, help='Path to .fil file to be read')
 args = parser.parse_args()
-
-filename=args.filename
+filename = args.filename
 
 def band_classifier(x): #Uses 'x', the middle frequency of the spectrum, to determine the band
     #x must be in MHz!
@@ -24,10 +23,16 @@ def band_classifier(x): #Uses 'x', the middle frequency of the spectrum, to dete
         band = 'K'
     return band
 
-def fil_parameters(filename):
-    fmax=float(subprocess.check_output(['/usr/local/sigproc/bin/header', filename, '-fch1'])) #Obtains freq (MHz) of first channel from SIGPROC header function
-    nchans=float(subprocess.check_output(['/usr/local/sigproc/bin/header', filename, '-nchans'])) #Number of channels, from SIGPROC header
-    ch_bandwidth=float(subprocess.check_output(['/usr/local/sigproc/bin/header', filename, '-foff'])) #Channel bandwitch, from SIGPROC header
+def params(filename):
+   
+    fmax=subprocess.Popen(['/usr/local/sigproc/bin/header', filename, '-fch1'], stdout=subprocess.PIPE) #Obtains freq (MHz) of first channel from SIGPROC header function
+    fmax=float((fmax.communicate()[0]))
+    
+    nchans=subprocess.Popen(['/usr/local/sigproc/bin/header', filename, '-nchans'], stdout=subprocess.PIPE) #Number of channels, from SIGPROC header
+    nchans=float(nchans.communicate()[0])
+
+    ch_bandwidth=subprocess.Popen(['/usr/local/sigproc/bin/header', filename, '-foff'], stdout=subprocess.PIPE) #Channel bandwitch, from SIGPROC header
+    ch_bandwidth=float(ch_bandwidth.communicate()[0]) 
 
     bandwidth = (nchans)*(ch_bandwidth) #Bandwidth of the entire spectrum from the .fil file
     fmin = fmax + bandwidth
@@ -36,8 +41,24 @@ def fil_parameters(filename):
     band = band_classifier(fmid)
 
     fil_parameters = {'fmin':fmin, 'fmax':fmax, 'bandwidth':abs(bandwidth), 'band':band} 
-   
+
     return fil_parameters
 
-print fil_parameters(filename)
+print params(filename)
 
+#print fil_parameters(filename)['fmin'], fil_parameters(filename)['fmax']
+
+
+
+
+
+#print fil_parameters(filename)
+
+#fmin=fil_parameters(filename)['fmin']
+#fmax=fil_parameters(filename)['fmax']
+
+#if fmin <= 2400 <= fmax:
+  #  with open('wifi.txt', 'a+') as file:
+ #       file.write('%s' % (filename))
+#else:
+#    print 'does not contain wifi'
