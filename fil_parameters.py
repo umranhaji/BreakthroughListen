@@ -46,19 +46,13 @@ def params(filename):
 
 print params(filename)
 
-#print fil_parameters(filename)['fmin'], fil_parameters(filename)['fmax']
 
-
-
-
-
-#print fil_parameters(filename)
-
-#fmin=fil_parameters(filename)['fmin']
-#fmax=fil_parameters(filename)['fmax']
+#fmin=params(filename)['fmin']
+#fmax=params(filename)['fmax']
 
 #if fmin <= 2400 <= fmax:
-  #  with open('wifi.txt', 'a+') as file:
- #       file.write('%s' % (filename))
+#    print 'contains wifi'
+#    with open('/datax2/filterbank_plots/wifi.txt', 'a+') as file:
+#        file.write('%s' % (filename))
 #else:
 #    print 'does not contain wifi'
