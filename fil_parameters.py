@@ -24,7 +24,8 @@ def band_classifier(x): #Uses 'x', the middle frequency of the spectrum, to dete
     return band
 
 def params(filename):
-   
+    #Takes in the path to a .fil file, returns a dictionary of its parameters.
+
     fmax=subprocess.Popen(['/usr/local/sigproc/bin/header', filename, '-fch1'], stdout=subprocess.PIPE) #Obtains freq (MHz) of first channel from SIGPROC header function
     fmax=float((fmax.communicate()[0]))
     
@@ -46,13 +47,3 @@ def params(filename):
 
 print params(filename)
 
-
-#fmin=params(filename)['fmin']
-#fmax=params(filename)['fmax']
-
-#if fmin <= 2400 <= fmax:
-#    print 'contains wifi'
-#    with open('/datax2/filterbank_plots/wifi.txt', 'a+') as file:
-#        file.write('%s' % (filename))
-#else:
-#    print 'does not contain wifi'
