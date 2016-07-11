@@ -1,11 +1,7 @@
 from filterbank import Filterbank
 import numpy as np
-import os
-import fnmatch
-import random
-import re
-import csv
-import argparse
+import matplotlib.pyplot as plt
+import os, fnmatch, random, re, csv, argparse
 
 
 parser = argparse.ArgumentParser(description='Extract params from fils')
@@ -23,7 +19,6 @@ def band(file): #Classifies filterbank file into a band according to its middle 
     nchans = fil.header['nchans']
     ch_bandwidth = fil.header['foff']
     fmid = fmax + (nchans*ch_bandwidth)/2.0
-
     if 1000 <= fmid < 2000:
         band = 'L'
     elif 2000 <= fmid < 4000:
@@ -47,22 +42,66 @@ def shuffler(list): #Shuffles list (makes random.shuffle act like a conventional
     random.shuffle(list)
     return list
             
+
 def HIP(filename): #Obtains Hipparcos number of target star from filterbank filename
     try:
-        star = re.search('HIP(.+?)_', filename)
+        star = re.search('HIP(.+?)_', filename).group(1)
         return star
     except:
-        raise ValueError("{0} does not have appropriate filename, could not extract HIP number." .format(filename))
+        raise ValueError("{0} has inappropriate filename, could not extract HIP number." .format(filename))
+
 
 def spectype(HIPnumber): #Gets spectral type for given HIP number
-    with open('hygdata_v3.csv', 'r') as csvfile:
+    with open('/datax2/filterbank_plots/spectral_type_comparer/HYG-Database/hygdata_v3.csv', 'r') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            if row['hip'] == {0} .format(HIPnumber):
-                return row['spect']
+            if row['hip'] == HIPnumber:
+                return row['spect'][:2]
+                break
 
+def avg_data(files): #Finds mean and median power spectrum profiles given a list of files of same frequency range
+    data = []
+    for file in files:
+        fil = Filterbank(file)
+        power_vals = fil.data[0][0]                  
+        data.append(power_vals)
+
+    data = np.array(data)
+    stacked_data = np.dstack(data)[0] #Turns data into array of length equal to # of chans, each of size equal to number of data points
+
+    mean_data = []
+    median_data = []
+
+    for channel in stacked_data:
+        mean = np.mean(channel)
+        median = np.median(channel)
+        mean_data.append(mean)
+        median_data.append(median)
+
+    mean_data=np.array(mean_data)
+    median_data=np.array(median_data)
+    freqs = np.array(Filterbank(files[0]).freqs)
+
+    dict = { 'freqs':freqs, 'mean_data':mean_data, 'median_data':median_data }
+    return dict
+    
+        
 #~~~~~~~~~~Main Code~~~~~~~~~~
 
+print "Extracting star and band information from file..."
+hip = HIP(filename)
+spec = spectype(hip)
+blc = blc(filename)
+desired_band  = band(filename)
+
+print
+print "Star = HIP{0}" .format(hip)
+print "Spectral Type = {0}" .format(spec)
+print "Compute Node = {0}" .format(blc)
+print "Band = {0}" .format(desired_band)
+print
+
+#Prompt user for sample size:
 
 prompt = True
 while prompt:
@@ -73,23 +112,39 @@ while prompt:
     except:
         print 'Not an integer!'
 
-blc = blc(filename)
+#Search directories for appropriate filterbank files:
+
+print "Finding filterbank files in compute node {0}..." .format(blc)
+print
+
 path = '/mnt_blc{0}' .format(blc)
-
-print "Finding filterbank files..."
-
 files = []
 for root, dirs, filenames in os.walk(path):
     for filename in fnmatch.filter(filenames, 'blc{}*guppi*HIP*gpuspec.0002.fil' .format(blc)):
         files.append(os.path.join(root, filename))
-
 files = shuffler(files)
 
-print "Building sample of {0} files..."
+print "Building sample of {0} files of same band and spectral type..." .format(sample_size)
+print
 
 sample = []
+count = 0
 while len(sample) < sample_size:
+    print "Current sample size = {}" .format(count)
     newfile = random.choice(files)
-    if 
+    files.remove(newfile)
+    print "Files left to search = {0}" .format(len(files))
+    if (spectype(HIP(newfile)) == spec) and (band(newfile) == desired_band):
+        sample.append(newfile)
+        count = count + 1
+
+print
+print 'Sample construction complete!'
+print
+print "Finding mean and median profiles..."
+
+print avg_data(sample)['freqs']
+print avg_data(sample)['mean_data']
+print avg_data(sample)['median_data']
 
 
