@@ -1,6 +1,7 @@
 from filterbank import Filterbank
 import numpy as np
 import matplotlib.pyplot as plt
+#from matplotlib.ticker import ScalarFormatter
 import os, fnmatch, random, re, csv, argparse
 
 
@@ -9,6 +10,9 @@ parser.add_argument('filename', type=str, help='Path to fil file')
 args = parser.parse_args()
 filename = args.filename
 
+fil = Filterbank(filename)
+source = fil.header['source_name']
+file_data = fil.data[0][0]
 
 #~~~~~~~~~~Functions~~~~~~~~~~
 
@@ -29,7 +33,6 @@ def band(file): #Classifies filterbank file into a band according to its middle 
         band = 'X'
     return band
 
-
 def blc(filename): #Extracts blc number from filterbank filename
     try:
         blc = re.search('blc(.+?)_', filename).group(1)
@@ -37,11 +40,9 @@ def blc(filename): #Extracts blc number from filterbank filename
     except:
         raise ValueError("{0} has inappropriate filename, could not extract blc number." .format(filename))
 
-
 def shuffler(list): #Shuffles list (makes random.shuffle act like a conventional function)
     random.shuffle(list)
     return list
-            
 
 def HIP(filename): #Obtains Hipparcos number of target star from filterbank filename
     try:
@@ -49,7 +50,6 @@ def HIP(filename): #Obtains Hipparcos number of target star from filterbank file
         return star
     except:
         raise ValueError("{0} has inappropriate filename, could not extract HIP number." .format(filename))
-
 
 def spectype(HIPnumber): #Gets spectral type for given HIP number
     with open('/datax2/filterbank_plots/spectral_type_comparer/HYG-Database/hygdata_v3.csv', 'r') as csvfile:
@@ -81,10 +81,8 @@ def avg_data(files): #Finds mean and median power spectrum profiles given a list
     mean_data=np.array(mean_data)
     median_data=np.array(median_data)
     freqs = np.array(Filterbank(files[0]).freqs)
-
     dict = { 'freqs':freqs, 'mean_data':mean_data, 'median_data':median_data }
     return dict
-    
         
 #~~~~~~~~~~Main Code~~~~~~~~~~
 
@@ -136,15 +134,61 @@ while len(sample) < sample_size:
     print "Files left to search = {0}" .format(len(files))
     if (spectype(HIP(newfile)) == spec) and (band(newfile) == desired_band):
         sample.append(newfile)
-        count = count + 1
+        count +=1
 
 print
 print 'Sample construction complete!'
 print
 print "Finding mean and median profiles..."
 
-print avg_data(sample)['freqs']
-print avg_data(sample)['mean_data']
-print avg_data(sample)['median_data']
+freqs = avg_data(sample)['freqs']
+mean_data = avg_data(sample)['mean_data']
+median_data =  avg_data(sample)['median_data']
 
+#fil = Filterbank(filename)
+#file_data = fil.data[0][0]
 
+mean_resids = file_data - mean_data
+median_resids = file_data - median_data
+
+#source = fil.header['source_name']
+
+plt.figure(1)
+plt.subplot(221)
+plt.plot(freqs, mean_data)
+plt.xlim(freqs[0], freqs[-1])
+plt.title("Mean Profile for Type {0}" .format(spec))
+plt.xlabel("Frequency [MHz]")
+plt.ylabel("Power")
+plt.grid()
+plt.ticklabel_format(useOffset=False)
+
+plt.subplot(222)
+plt.plot(freqs, median_data)
+plt.xlim(freqs[0], freqs[-1])
+plt.title("Median Profile for Type {0}" .format(spec))
+plt.xlabel("Frequency [MHz]")
+plt.ylabel("Power")
+plt.grid()
+plt.ticklabel_format(useOffset=False)
+
+plt.subplot(223)
+plt.plot(freqs, mean_resids)
+plt.xlim(freqs[0], freqs[-1])
+plt.title("{0} Minus Mean {1} Profile" .format(source, spec))
+plt.xlabel("Frequency [MHz]")
+plt.ylabel("Power")
+plt.grid()
+plt.ticklabel_format(useOffset=False)
+
+plt.subplot(224)
+plt.plot(freqs, median_resids)
+plt.xlim(freqs[0], freqs[-1])
+plt.title("{0} Minus Median {1} Profile" .format(source, spec))
+plt.xlabel("Frequency [MHz]")
+plt.ylabel("Power")
+plt.grid()
+plt.ticklabel_format(useOffset=False)
+
+plt.tight_layout()
+plt.show()
