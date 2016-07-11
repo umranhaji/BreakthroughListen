@@ -67,7 +67,6 @@ while prompt:
         prompt = False
     except:
         print("Not an integer!")
-sample_size = int(sample_size)
 
 paths = ['/mnt_blc00', '/mnt_blc01', '/mnt_blc02', '/mnt_blc03', '/mnt_blc04', '/mnt_blc05', '/mnt_blc06', '/mnt_blc07']
 files = []
