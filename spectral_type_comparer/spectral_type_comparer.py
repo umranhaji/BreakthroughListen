@@ -39,7 +39,7 @@ def blc(filename): #Extracts blc number from filterbank filename
     except:
         raise ValueError("{0} has inappropriate filename, could not extract blc number." .format(filename))
 
-def rescode(filename): #Extracts resolution code (.gpuspec.0001, .gpuspec.0002, etc.) from filterbank filename
+def rescode(filename): #Extracts resolution code (0001, 0002, etc.) from filterbank filename
     try:
         rescode = re.search('.gpuspec.(.+?).fil', filename).group(1)
         return rescode
@@ -101,7 +101,7 @@ print "Extracting star and band information from file..."
 hip = HIP(filename)
 spec = spectype(hip)
 blc = blc(filename)
-desired_band  = band(filename)
+band  = band(filename)
 fmax = maxfreq(filename)
 res = rescode(filename)
 
@@ -109,7 +109,7 @@ print
 print "Star = HIP{0}" .format(hip)
 print "Spectral Type = {0}" .format(spec)
 print "Compute Node = {0}" .format(blc)
-print "Band = {0}" .format(desired_band)
+print "Band = {0}" .format(band)
 print "Max Freq = {0}" .format(fmax)
 print "Resolution Code = {0}" .format(res)
 print
