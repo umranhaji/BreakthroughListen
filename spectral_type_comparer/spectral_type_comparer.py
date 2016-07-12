@@ -40,6 +40,13 @@ def blc(filename): #Extracts blc number from filterbank filename
     except:
         raise ValueError("{0} has inappropriate filename, could not extract blc number." .format(filename))
 
+def rescode(filename): #Extracts resolution code (.gpuspec.0001, .gpuspec.0002, etc.) from filterbank filename
+    try:
+        rescode = re.search('.gpuspec.(.+?).fil', filename).group(1)
+        return rescode
+    except:
+        raise ValueError("{0} has inappropriate filename, could not extract resolution code." .format(filename))
+
 def shuffler(list): #Shuffles list (makes random.shuffle act like a conventional function)
     random.shuffle(list)
     return list
@@ -51,13 +58,18 @@ def HIP(filename): #Obtains Hipparcos number of target star from filterbank file
     except:
         raise ValueError("{0} has inappropriate filename, could not extract HIP number." .format(filename))
 
-def spectype(HIPnumber): #Gets spectral type for given HIP number
+def spectype(HIPnumber): #Gets two-digit spectral type for given HIP number
     with open('/datax2/filterbank_plots/spectral_type_comparer/HYG-Database/hygdata_v3.csv', 'r') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             if row['hip'] == HIPnumber:
                 return row['spect'][:2]
                 break
+
+def maxfreq(file): #Returns max frequency in a .fil file
+    fil = Filterbank(file)
+    maxfreq = fil.header['fch1']
+    return maxfreq
 
 def avg_data(files): #Finds mean and median power spectrum profiles given a list of files of same frequency range
     data = []
@@ -91,13 +103,16 @@ hip = HIP(filename)
 spec = spectype(hip)
 blc = blc(filename)
 desired_band  = band(filename)
+fmax = maxfreq(filename)
+res = rescode(filename)
 
 print
 print "Star = HIP{0}" .format(hip)
 print "Spectral Type = {0}" .format(spec)
 print "Compute Node = {0}" .format(blc)
 print "Band = {0}" .format(desired_band)
-print
+print "Max Freq = {0}" .format(fmax)
+print "Resolution Code = {0}" .format(res)
 
 #Prompt user for sample size:
 
@@ -112,13 +127,13 @@ while prompt:
 
 #Search directories for appropriate filterbank files:
 
-print "Finding filterbank files in compute node {0}..." .format(blc)
+print "Finding filterbank files in compute node {0} with rescode {1}..." .format(blc,res)
 print
 
 path = '/mnt_blc{0}' .format(blc)
 files = []
 for root, dirs, filenames in os.walk(path):
-    for filename in fnmatch.filter(filenames, 'blc{}*guppi*HIP*gpuspec.0002.fil' .format(blc)):
+    for filename in fnmatch.filter(filenames, 'blc{0}*guppi*HIP*gpuspec.{1}.fil' .format(blc,res)):
         files.append(os.path.join(root, filename))
 files = shuffler(files)
 
@@ -132,9 +147,12 @@ while len(sample) < sample_size:
     newfile = random.choice(files)
     files.remove(newfile)
     print "Files left to search = {0}" .format(len(files))
-    if (spectype(HIP(newfile)) == spec) and (band(newfile) == desired_band):
+    if (spectype(HIP(newfile)) == spec) and (maxfreq(newfile) == fmax):
         sample.append(newfile)
         count = len(sample)
+        print "Added {0} to sample." .format(newfile)
+    if len(files) == 0:
+        raise RuntimeError("Your chosen sample size is larger than the number of compatible files. Please try again with smaller sample size.")
 
 print
 print 'Sample construction complete!'
@@ -145,13 +163,11 @@ freqs = avg_data(sample)['freqs']
 mean_data = avg_data(sample)['mean_data']
 median_data =  avg_data(sample)['median_data']
 
-#fil = Filterbank(filename)
-#file_data = fil.data[0][0]
-
 mean_resids = file_data - mean_data
 median_resids = file_data - median_data
 
-#source = fil.header['source_name']
+print
+print "Plotting..."
 
 plt.figure(1)
 plt.subplot(221)
