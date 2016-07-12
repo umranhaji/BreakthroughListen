@@ -126,6 +126,7 @@ for file in sample:
     alts.append(AA(file)['alt'])
     azs.append(AA(file)['az'])
     powers.append(totalpower(file,1350,1450))
+    print "Calculated values for {1} file." .format(len(alts))
 
 alts = np.array(alts)
 azs = np.array(azs)
