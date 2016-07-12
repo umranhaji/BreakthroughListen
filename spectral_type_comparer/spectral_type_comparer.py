@@ -152,7 +152,8 @@ while len(sample) < sample_size:
         count = len(sample)
         print "Added {0} to sample." .format(newfile)
     if len(files) == 0:
-        raise RuntimeError("Your chosen sample size is larger than the number of compatible files. Please try again with smaller sample size.")
+        raise RuntimeError("Your chosen sample size is larger than the \
+number of compatible files. Please try again with smaller sample size.")
 
 print
 print 'Sample construction complete!'
