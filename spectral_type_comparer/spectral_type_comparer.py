@@ -134,7 +134,7 @@ while len(sample) < sample_size:
     print "Files left to search = {0}" .format(len(files))
     if (spectype(HIP(newfile)) == spec) and (band(newfile) == desired_band):
         sample.append(newfile)
-        count +=1
+        count = len(sample)
 
 print
 print 'Sample construction complete!'
