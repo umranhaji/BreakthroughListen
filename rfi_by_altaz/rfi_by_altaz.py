@@ -58,23 +58,22 @@ def totalpower(file, fmin, fmax):
     totalpower = simps(x=newfreqs, y=newdata)
     return totalpower
 
-def plot_polar_contour(alts, azs, powers):
+#def plot_polar_contour(alts, azs, powers):
+#    radii = np.cos(np.radians(alts))
+#    theta = np.radians(azs)
 
-    radii = np.cos(np.radians(alts))
-    theta = np.radians(azs)
+#    radii, theta = np.meshgrid(radii, theta)
 
-    radii, theta = np.meshgrid(radii, theta)
+#    fig, ax = subplots(subplot_kw=dict(projection='polar'))
+#    ax.set_theta_zero_location("N")
+#    ax.set_theta_direction(-1)
+#    autumn()
+#    cax=ax.contourf(theta, radii, powers, 30)
+#    autumn()
+#    cb = fig.colorbar(cax)
+#    cb.set_label('label')
 
-    fig, ax = subplots(subplot_kw=dict(projection='polar'))
-    ax.set_theta_zero_location("N")
-    ax.set_theta_direction(-1)
-    autumn()
-    cax=ax.contourf(theta, radii, powers, 30)
-    autumn()
-    cb = fig.colorbar(cax)
-    cb.set_label('label')
-
-    return fig, ax, cax
+#    return fig, ax, cax
 
 
 
@@ -115,7 +114,7 @@ while len(sample) < sample_size:
         count = len(sample)
         print "Add {0} to sample." .format(newfile)
     if len(files) == 0:
-        raise RuntimeError("Your chosen sample size is larger than the number of compatible files. Please try again with a small sample size.")
+        raise RuntimeError("Your chosen sample size is larger than the number of compatible files. Please try again with a smaller sample size.")
 
 print "Calculating alt, az, and power values..."
 
