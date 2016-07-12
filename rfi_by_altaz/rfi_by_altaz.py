@@ -6,6 +6,7 @@ from astropy import units as u
 from astropy.time import Time
 from astropy.coordinates import EarthLocation, SkyCoord, AltAz
 from scipy.integrate import simps
+from scipy.interpolate import Rbf
 from filterbank import Filterbank
 
 
@@ -21,6 +22,10 @@ def shuffler(list): #Shuffles a list (makes random.shuffle act like a convention
     random.shuffle(list)
     return list
 
+def maxfreq(file):
+    fil = Filterbank(file)
+    maxfreq = fil.header['fch1']
+    return maxfreq
 
 def AA(file): #Returns AltAz coords for given observation
 
@@ -32,9 +37,7 @@ def AA(file): #Returns AltAz coords for given observation
     target = SkyCoord(ra, dec)
     altaz = target.transform_to(AltAz(location=GreenBank, obstime=Time(MJD, format='mjd')))
     dict = { 'alt' : altaz.alt.degree, 'az' : altaz.az.degree }
-
     return dict
-
 
 def totalpower(file, fmin, fmax):
     fil = Filterbank(file)
@@ -42,6 +45,9 @@ def totalpower(file, fmin, fmax):
     nchans = fil.header['nchans']
     ch_bandwidth = fil.header['foff']
     minfreq = maxfreq + nchans*ch_bandwidth
+    
+    print maxfreq
+    
     if fmin < minfreq or fmax > maxfreq:
         raise ValueError("One of the freq constraints is out of the freq range of this filterbank file.")
 
@@ -85,9 +91,17 @@ sample  = random.sample(files, sample_size)
 
 alts = []
 azs = []
+powers = []
 for file in sample:
     alts.append(AA(file)['alt'])
     azs.append(AA(file)['az'])
+    powers.append(totalpower, 1350, 1450)
 
-print alts
-print azs
+#sample = []
+#count = 0
+#while len(sample) < sample_size:
+#    print "Current sample size = {0}" .format(count)
+#    newfile = random.choice(files)
+#    files.remove(newfile)
+#    print "Files left to search = {0}" .format(len(files))
+#    if np.round(maxfreq(newfile), decimals=3) == float(
