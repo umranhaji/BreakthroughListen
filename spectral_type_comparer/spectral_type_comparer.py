@@ -1,7 +1,6 @@
 from filterbank import Filterbank
 import numpy as np
 import matplotlib.pyplot as plt
-#from matplotlib.ticker import ScalarFormatter
 import os, fnmatch, random, re, csv, argparse
 
 
@@ -113,6 +112,7 @@ print "Compute Node = {0}" .format(blc)
 print "Band = {0}" .format(desired_band)
 print "Max Freq = {0}" .format(fmax)
 print "Resolution Code = {0}" .format(res)
+print
 
 #Prompt user for sample size:
 
