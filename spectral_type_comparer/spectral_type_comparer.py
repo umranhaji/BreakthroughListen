@@ -16,23 +16,22 @@ file_data = fil.data[0][0]
 #~~~~~~~~~~Functions~~~~~~~~~~
 
 
-def band(file): #Classifies filterbank file into a band according to its middle freq
-    fil = Filterbank(file)
+def band_finder(filename): #Classifies filterbank file into a band according to its middle freq
+    fil = Filterbank(filename)
     fmax = fil.header['fch1']
     nchans = fil.header['nchans']
     ch_bandwidth = fil.header['foff']
     fmid = fmax + (nchans*ch_bandwidth)/2.0
     if 1000 <= fmid < 2000:
-        band = 'L'
+        return 'L'
     elif 2000 <= fmid < 4000:
-        band = 'S'
+        return 'S'
     elif 4000 <= fmid < 8000:
-        band = 'C'
+       return 'C'
     elif 8000 <= fmid < 12000:
-        band = 'X'
-    return band
+        return 'X'
 
-def blc(filename): #Extracts blc number from filterbank filename
+def blc_finder(filename): #Extracts blc number from filterbank filename
     try:
         blc = re.search('blc(\d\d)_guppi', filename).group(1)
         return blc
@@ -50,20 +49,41 @@ def shuffler(list): #Shuffles list (makes random.shuffle act like a conventional
     random.shuffle(list)
     return list
 
-def HIP(filename): #Obtains Hipparcos number of target star from filterbank filename
-    try:
-        star = re.search('HIP(.+?)_', filename).group(1)
-        return star
-    except:
-        raise ValueError("{0} has inappropriate filename, could not extract HIP number." .format(filename))
+def catalog_finder(filename): #Determines the catalog a star is in
+    if "HIP" in filename:
+        return "HIP" #Hipparcos
+    if "GJ" in filename:
+        return "GJ" #Gliese
 
-def spectype(HIPnumber): #Gets two-digit spectral type for given HIP number
-    with open('/datax2/filterbank_plots/spectral_type_comparer/HYG-Database/hygdata_v3.csv', 'r') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if row['hip'] == HIPnumber:
-                return row['spect'][:2]
-                break
+def starnumber_finder(filename): #Obtains catalog number of target star from filterbank filename
+    if catalog_finder(filename) == "HIP":
+        try:
+            star = re.search('_HIP(.+?)_', filename).group(1)
+            return star
+        except:
+            raise ValueError("{0} has inappropriate filename, could not extract HIP number." .format(filename))
+    if catalog_finder(filename) == "GJ":
+        try:
+            star = re.search('_GJ(.+?)_', filename).group(1)
+            return star
+        except:
+            raise ValueError("{0} has inappropriate filename, could not extract GJ number." .format(filename))
+
+def spectype(catalog, starnumber): #Gets two-digit spectral type given catalog and number
+    if catalog == "HIP":
+        with open('/datax2/filterbank_plots/spectral_type_comparer/HYG-Database/hygdata_v3.csv', 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row['hip'] == starnumber:
+                    return row['spect'][:2]
+                    break
+    if catalog == "GJ":
+        with open('/datax2/filterbank_plots/spectral_type_comparer/HYG-Database/hygdata_v3.csv', 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row['gl'] == starnumber:
+                    return row['spect'][:2]
+                    break
 
 def maxfreq(file): #Returns max frequency in a .fil file
     fil = Filterbank(file)
@@ -82,31 +102,35 @@ def avg_data(files): #Finds mean and median power spectrum profiles given a list
 
     mean_data = []
     median_data = []
-
     for channel in stacked_data:
-        mean = np.mean(channel)
-        median = np.median(channel)
-        mean_data.append(mean)
-        median_data.append(median)
+        mean_data.append(np.mean(channel))
+        median_data.append(np.median(channel))
 
     mean_data=np.array(mean_data)
     median_data=np.array(median_data)
     freqs = np.array(Filterbank(files[0]).freqs)
     dict = { 'freqs':freqs, 'mean_data':mean_data, 'median_data':median_data }
     return dict
+
         
 #~~~~~~~~~~Main Code~~~~~~~~~~
 
+print catalog_finder(filename)
+print starnumber_finder(filename)
+
+
 print "Extracting star and band information from file..."
-hip = HIP(filename)
-spec = spectype(hip)
-blc = blc(filename)
-band  = band(filename)
+
+cat = catalog_finder(filename)
+star = starnumber_finder(filename)
+spec = spectype(cat, star)
+blc = blc_finder(filename)
+band = band_finder(filename)
 fmax = maxfreq(filename)
 res = rescode(filename)
 
 print
-print "Star = HIP{0}" .format(hip)
+print "Star = {0}{1}" .format(cat, star)
 print "Spectral Type = {0}" .format(spec)
 print "Compute Node = {0}" .format(blc)
 print "Band = {0}" .format(band)
@@ -135,7 +159,7 @@ files = []
 
 
 for root, dirs, filenames in os.walk(path):
-    for filename in fnmatch.filter(filenames, 'blc{0}*guppi*HIP*gpuspec.{1}.fil' .format(blc,res)):
+    for filename in fnmatch.filter(filenames, 'blc{0}*guppi*gpuspec.{1}.fil' .format(blc,res)):
         files.append(os.path.join(root, filename))
 files = shuffler(files)
 
@@ -149,7 +173,7 @@ while len(sample) < sample_size:
     newfile = random.choice(files)
     files.remove(newfile)
     print "Files left to search = {0}" .format(len(files))
-    if (spectype(HIP(newfile)) == spec) and (maxfreq(newfile) == fmax):
+    if spectype(catalog_finder(newfile), starnumber_finder(newfile)) == spec and maxfreq(newfile) == fmax:
         sample.append(newfile)
         count = len(sample)
         print "Added {0} to sample." .format(newfile)
