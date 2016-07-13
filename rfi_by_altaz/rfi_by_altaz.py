@@ -155,6 +155,8 @@ plt.scatter(x,y,c=z)
 plt.title("Total Power from {0} to {1} MHz" .format(fmin, fmax))
 plt.xlabel("Azimuth of Observation (degrees)")
 plt.ylabel("Altitude of Observation (degrees)")
+plt.contour(xi, yi, zi, 5)
+plt.grid()
 plt.show()
 
 
