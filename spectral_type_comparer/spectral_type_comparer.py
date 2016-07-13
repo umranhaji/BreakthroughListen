@@ -34,7 +34,7 @@ def band(file): #Classifies filterbank file into a band according to its middle 
 
 def blc(filename): #Extracts blc number from filterbank filename
     try:
-        blc = re.search('blc(.+?)_', filename).group(1)
+        blc = re.search('blc(\d\d)_guppi', filename).group(1)
         return blc
     except:
         raise ValueError("{0} has inappropriate filename, could not extract blc number." .format(filename))
@@ -132,6 +132,8 @@ print
 
 path = '/mnt_blc{0}' .format(blc)
 files = []
+
+
 for root, dirs, filenames in os.walk(path):
     for filename in fnmatch.filter(filenames, 'blc{0}*guppi*HIP*gpuspec.{1}.fil' .format(blc,res)):
         files.append(os.path.join(root, filename))
