@@ -92,12 +92,14 @@ while prompt:
 #paths = ['/mnt_blc00', '/mnt_blc01', '/mnt_blc02', '/mnt_blc03', '/mnt_blc04', '/mnt_blc05', '/mnt_blc06', '/mnt_blc07']
 files = []
 
+print
 print "Finding filterbank files..."
 
 for root, dirs, filenames in os.walk('/mnt_blc04'):
     for filename in fnmatch.filter(filenames, '*guppi*HIP*gpuspec.0002.fil'):
         files.append(os.path.join(root, filename))
 
+print
 print "Obtaining random sample of {0} files..." .format(sample_size)
 
 files = shuffler(files)
@@ -116,6 +118,7 @@ while len(sample) < sample_size:
     if len(files) == 0:
         raise RuntimeError("Your chosen sample size is larger than the number of compatible files. Please try again with a smaller sample size.")
 
+print
 print "Calculating alt, az, and power values..."
 
 alts = []
@@ -125,7 +128,7 @@ for file in sample:
     alts.append(AA(file)['alt'])
     azs.append(AA(file)['az'])
     powers.append(totalpower(file,1350,1450))
-    print "Calculated values for {0} file." .format(len(alts))
+    print "Calculated values for {0} files." .format(len(alts))
 
 alts = np.array(alts)
 azs = np.array(azs)
@@ -135,10 +138,10 @@ import matplotlib.pyplot as plt
 
 print "Plotting..."
 
-x = alts
-y = azs
+x = azs
+y = alts
 z = powers
-xi, yi = np.linspace(0, 90, 100), np.linspace(0, 360, 100)
+xi, yi = np.linspace(0, 360, 360), np.linspace(0, 90, 90)
 xi, yi = np.meshgrid(xi, yi)
 rbf = Rbf(x,y,z, function='linear')
 
@@ -146,9 +149,12 @@ rbf = Rbf(x,y,z, function='linear')
 
 zi = rbf(xi,yi)
 
-plt.imshow(zi, vmin=z.min(), vmax=z.max(), origin='lower', extent=[0,90,0,360], aspect='auto')
+plt.imshow(zi, vmin=z.min(), vmax=z.max(), origin='lower', extent=[0,360,0,90], aspect='auto')
 plt.colorbar()
 plt.scatter(x,y,c=z)
+plt.title("Total Power from {0} to {1} MHz" .format(fmin, fmax))
+plt.xlabel("Azimuth of Observation (degrees)")
+plt.ylabel("Altitude of Observation (degrees)")
 plt.show()
 
 
