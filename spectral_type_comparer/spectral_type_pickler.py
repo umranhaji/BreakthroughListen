@@ -59,11 +59,11 @@ for path in paths:
 print "Categorizing files by paramaters..."
 
 d = {}
-count = len(d)
 
 for i in range(10):
 #for file in files:
     file = files[i]
+    count = len(d)
 
     print "Number of Keys = {0}" .format(count)
     print "Files left to search = {0}" .format(len(files))
