@@ -59,9 +59,9 @@ for path in paths:
 print "Categorizing files by paramaters..."
 
 d = {}
-count = 0
+count = len(d)
 
-for i in range(40):
+for i in range(10):
 #for file in files:
     file = files[i]
 
@@ -73,12 +73,14 @@ for i in range(40):
     else:
         key = keyfinder(file)
         if key in d:
-            d[key].append(file)
             print "{0} already in dict. Adding file." .format(key)
+            if not file in d[key]:
+                d[key].append(file)
+            else:
+                print "File already in dict value. Skipping..."
         if not key in d:
             d[key] = []
             d[key].append(file)
-            count += 1
             print "Added {0} to dict" .format(key)
 
     files.remove(file)
@@ -86,7 +88,8 @@ for i in range(40):
 for key, value in d.items():
     print (key, '---->', value)
 
-
+print
+print "Saving dictionary to pickle file..."
 
 with open('spectype_configurations.pkl', 'wb') as picklefile:
     pickle.dump(d, picklefile)
